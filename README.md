@@ -1,5 +1,5 @@
 # logUtils
-开发时常用的日志工具
+将日志生成到本地存储的工具，可用于复杂问题的排查
 
 <h3>  添加仓库<h3/>
 <font>maven { url 'https://jitpack.io' }<font/>
