@@ -12,10 +12,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * author : ChenShengDan
@@ -32,7 +28,7 @@ public class LogThread extends Thread {
     public static String logFileName = "APP_" + getNowTimeDay() + ".log";
     private String oldLogFileName = "APP_" + getTimeDay(getYesterdayTimestamp()) + ".log";
     //日志文件大小上限 单位KB
-    private int logFileLength = 20480; //kb
+    private int logFileSize = 20480; //kb
     //日志文件对象
     private File logFile;
     //控制日志是否记录
@@ -42,6 +38,28 @@ public class LogThread extends Thread {
 
     public LogThread(String logDir) {
         try {
+            //
+            logFilePath = logDir+"/log/";
+            Log.d(TAG, "LogThread: "+logFilePath);
+
+            File file = new File(logFilePath);
+            if (!file.exists()) file.mkdir();
+
+            File oldFile = new File(logFilePath + oldLogFileName);
+            if (oldFile.exists())oldFile.delete();
+
+            logFile = new File(logFilePath + logFileName);
+            if (!logFile.exists()) logFile.createNewFile();
+
+            os = new FileOutputStream(logFile, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public LogThread(String logDir,int logFileSize) {
+        try {
+            this.logFileSize = logFileSize;
             //
             logFilePath = logDir+"/log/";
             Log.d(TAG, "LogThread: "+logFilePath);
@@ -84,8 +102,8 @@ public class LogThread extends Thread {
                             os = new FileOutputStream(logFile, true);
                         }
 
-                        if (logFile.length() / 1024 > logFileLength) {
-                            Log.d(TAG, "run: 日志大于" + logFileLength + "KB 清空");
+                        if (logFile.length() / 1024 > logFileSize) {
+                            Log.d(TAG, "run: 日志大于" + logFileSize + "KB 清空");
                             clearInfoForFile(logFilePath + logFileName);
                         }
                         os.write(buf, 0, len);
@@ -127,11 +145,21 @@ public class LogThread extends Thread {
     }
 
     /**
-     * 开启日志线程
+     * 开启日志子线程
+     * @param logDir 保存的路径
      */
     public static void startLogThread(String logDir) {
         LogThread logThread = new LogThread(logDir);
         logThread.start();
     }
 
+    /**
+     * 开启日志子线程
+     * @param logDir 保存的路径
+     * @param size 日志本地保存的大小 单位kb
+     */
+    public static void startLogThread(String logDir,int size) {
+        LogThread logThread = new LogThread(logDir,size);
+        logThread.start();
+    }
 }

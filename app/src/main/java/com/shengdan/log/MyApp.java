@@ -15,6 +15,6 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         LogUtils.init(this);
-        LogThread.startLogThread(getExternalFilesDir("/myLogFile/").getPath());
+        LogThread.startLogThread(getExternalFilesDir("/myLogFile/").getPath(),204800);
     }
 }
